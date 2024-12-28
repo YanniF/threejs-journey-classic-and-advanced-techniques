@@ -47,6 +47,51 @@ door.position.y = 1
 door.position.z = 2.001 // extra space to avoid z fighting
 house.add(door)
 
+// Bushes
+const bushGeometry = new THREE.SphereGeometry(1, 16, 16)
+const bushMaterial = new THREE.MeshStandardMaterial()
+
+const bush1 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush1.position.set(.8, .2, 2.2)
+bush1.scale.setScalar(.5)
+
+const bush2 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush2.position.set(1.4, .1, 2.1)
+bush2.scale.set(.25, .25, .25)
+
+const bush3 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush3.position.set(-.8, .1, 2.2)
+bush3.scale.set(.4, .4, .4)
+
+const bush4 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush4.position.set(-1, .05, 2.6)
+bush4.scale.set(.15, .15, .15)
+
+house.add(bush1, bush2, bush3, bush4)
+
+// Graves
+const graveGeometry = new THREE.BoxGeometry(.6, .8, .2)
+const graveMaterial = new THREE.MeshStandardMaterial()
+
+const graves = new THREE.Group()
+scene.add(graves)
+
+for (let i = 0; i < 30; i++) {
+  const grave = new THREE.Mesh(graveGeometry, graveMaterial)
+  const angle = Math.random() * Math.PI * 2
+  const radius = 3 + Math.random() * 5
+
+  grave.position.x = Math.sin(angle) * radius
+  grave.position.z = Math.cos(angle) * radius
+  grave.position.y = Math.random() * .4
+
+  grave.rotation.x = (Math.random() - 0.5) * .4
+  grave.rotation.y = (Math.random() - 0.5) * .4
+  grave.rotation.z = (Math.random() - 0.5) * .4
+
+  graves.add(grave)
+}
+
 /**
  * Lights
  */
@@ -66,23 +111,23 @@ scene.add(directionalLight)
  * Sizes
  */
 const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
+  width: window.innerWidth,
+  height: window.innerHeight
 }
 
 window.addEventListener('resize', () =>
 {
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
+  // Update sizes
+  sizes.width = window.innerWidth
+  sizes.height = window.innerHeight
 
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
+  // Update camera
+  camera.aspect = sizes.width / sizes.height
+  camera.updateProjectionMatrix()
 
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  // Update renderer
+  renderer.setSize(sizes.width, sizes.height)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
 /**
@@ -103,7 +148,7 @@ controls.enableDamping = true
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+  canvas: canvas
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -115,18 +160,18 @@ const timer = new Timer()
 
 const tick = () =>
 {
-    // Timer
-    timer.update()
-    const elapsedTime = timer.getElapsed()
+  // Timer
+  timer.update()
+  const elapsedTime = timer.getElapsed()
 
-    // Update controls
-    controls.update()
+  // Update controls
+  controls.update()
 
-    // Render
-    renderer.render(scene, camera)
+  // Render
+  renderer.render(scene, camera)
 
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+  // Call tick again on the next frame
+  window.requestAnimationFrame(tick)
 }
 
 tick()
