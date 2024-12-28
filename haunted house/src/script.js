@@ -15,15 +15,37 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+// const axesHelper = new THREE.AxesHelper()
+// scene.add(axesHelper)
+
 /**
  * House
  */
-// Temporary sphere
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 32, 32),
-    new THREE.MeshStandardMaterial({ roughness: 0.7 })
-)
-scene.add(sphere)
+// Floor
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial())
+floor.rotation.x = - Math.PI / 2;
+scene.add(floor)
+
+// House container
+const house = new THREE.Group()
+scene.add(house)
+
+// Walls
+const walls = new THREE.Mesh(new THREE.BoxGeometry(4, 2.5, 4), new THREE.MeshStandardMaterial())
+walls.position.y = 1.25 // wall height / 2
+house.add(walls)
+
+// Roof
+const roof = new THREE.Mesh(new THREE.ConeGeometry(3.5, 1.5, 4), new THREE.MeshStandardMaterial())
+roof.position.y = 3.25 // wall height + (roof height / 2)
+roof.rotation.y = Math.PI / 4
+house.add(roof)
+
+// Door
+const door = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), new THREE.MeshStandardMaterial())
+door.position.y = 1
+door.position.z = 2.001 // extra space to avoid z fighting
+house.add(door)
 
 /**
  * Lights
@@ -36,6 +58,9 @@ scene.add(ambientLight)
 const directionalLight = new THREE.DirectionalLight('#ffffff', 1.5)
 directionalLight.position.set(3, 2, -8)
 scene.add(directionalLight)
+
+// const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
+// scene.add(directionalLightHelper)
 
 /**
  * Sizes
