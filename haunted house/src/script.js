@@ -1,7 +1,9 @@
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { Timer } from 'three/addons/misc/Timer.js'
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
+import {Timer} from 'three/addons/misc/Timer.js'
 import GUI from 'lil-gui'
+import {sRGBToLinear} from "three/nodes";
+import {TextureHelper} from "three/addons";
 
 /**
  * Base
@@ -19,11 +21,54 @@ const scene = new THREE.Scene()
 // scene.add(axesHelper)
 
 /**
+ * Textures
+ */
+const textureLoader = new THREE.TextureLoader()
+
+// Floor
+const floorAlphaTexture = textureLoader.load('./floor/alpha.jpg')
+const floorColorTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_diff_1k.webp')
+const floorARMTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_arm_1k.webp')
+const floorNormalTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_nor_gl_1k.webp')
+const floorDisplacementTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_disp_1k.webp')
+
+floorColorTexture.repeat.set(8, 8)
+floorARMTexture.repeat.set(8, 8)
+floorNormalTexture.repeat.set(8, 8)
+floorDisplacementTexture.repeat.set(8, 8)
+
+floorColorTexture.wrapS = THREE.RepeatWrapping
+floorARMTexture.wrapS = THREE.RepeatWrapping
+floorNormalTexture.wrapS = THREE.RepeatWrapping
+floorDisplacementTexture.wrapS = THREE.RepeatWrapping
+
+floorColorTexture.wrapT = THREE.RepeatWrapping
+floorARMTexture.wrapT = THREE.RepeatWrapping
+floorNormalTexture.wrapT = THREE.RepeatWrapping
+floorDisplacementTexture.wrapT = THREE.RepeatWrapping
+
+floorColorTexture.colorSpace = THREE.SRGBColorSpace
+
+/**
  * House
  */
 // Floor
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial())
-floor.rotation.x = - Math.PI / 2;
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20, 100, 100),
+  new THREE.MeshStandardMaterial({
+    alphaMap: floorAlphaTexture,
+    transparent: true,
+    map: floorColorTexture,
+    aoMap: floorARMTexture,
+    roughnessMap: floorARMTexture,
+    metalnessMap: floorARMTexture,
+    normalMap: floorNormalTexture,
+    displacementMap: floorDisplacementTexture,
+    displacementScale: 0.3,
+    displacementBias: -0.2
+  })
+)
+floor.rotation.x = -Math.PI / 2;
 scene.add(floor)
 
 // House container
@@ -108,6 +153,12 @@ scene.add(directionalLight)
 // scene.add(directionalLightHelper)
 
 /**
+ * Debug UI
+ */
+gui.add(floor.material, 'displacementScale').min(0).max(1).step(0.001).name('Floor Displacement Scale')
+gui.add(floor.material, 'displacementBias').min(-1).max(1).step(0.001).name('Floor Displacement Bias')
+
+/**
  * Sizes
  */
 const sizes = {
@@ -115,8 +166,7 @@ const sizes = {
   height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
   // Update sizes
   sizes.width = window.innerWidth
   sizes.height = window.innerHeight
@@ -158,8 +208,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 const timer = new Timer()
 
-const tick = () =>
-{
+const tick = () => {
   // Timer
   timer.update()
   const elapsedTime = timer.getElapsed()
