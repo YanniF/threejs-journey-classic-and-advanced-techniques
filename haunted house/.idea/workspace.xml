@@ -7,12 +7,19 @@
     <list default="true" id="82971d0f-f14d-4aac-8a18-ef51dcc4bf1c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/roof/roof_slates_02_1k/roof_slates_02_arm_1k.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/roof/roof_slates_02_1k/roof_slates_02_diff_1k.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/roof/roof_slates_02_1k/roof_slates_02_nor_gl_1k.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wall/castle_brick_broken_06_1k/castle_brick_broken_06_arm_1k.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wall/castle_brick_broken_06_1k/castle_brick_broken_06_diff_1k.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wall/castle_brick_broken_06_1k/castle_brick_broken_06_nor_gl_1k.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/bush/leaves_forest_ground_1k/leaves_forest_ground_arm_1k.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/bush/leaves_forest_ground_1k/leaves_forest_ground_diff_1k.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/bush/leaves_forest_ground_1k/leaves_forest_ground_nor_gl_1k.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/door/alpha.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/door/ambientOcclusion.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/door/color.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/door/height.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/door/metalness.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/door/normal.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/door/roughness.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/grave/plastered_stone_wall_1k/plastered_stone_wall_arm_1k.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/grave/plastered_stone_wall_1k/plastered_stone_wall_diff_1k.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/grave/plastered_stone_wall_1k/plastered_stone_wall_nor_gl_1k.jpg" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +68,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1735412816187</updated>
-      <workItem from="1735412818044" duration="17287000" />
+      <workItem from="1735412818044" duration="19411000" />
     </task>
     <servers />
   </component>

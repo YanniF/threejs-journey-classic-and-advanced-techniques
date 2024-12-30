@@ -69,6 +69,43 @@ roofNormalTexture.wrapS = THREE.RepeatWrapping
 
 roofColorTexture.colorSpace = THREE.SRGBColorSpace
 
+// Bushes
+const bushColorTexture = textureLoader.load('./bush/leaves_forest_ground_1k/leaves_forest_ground_diff_1k.webp')
+const bushARMTexture = textureLoader.load('./bush/leaves_forest_ground_1k/leaves_forest_ground_arm_1k.webp')
+const bushNormalTexture = textureLoader.load('./bush/leaves_forest_ground_1k/leaves_forest_ground_nor_gl_1k.webp')
+
+bushColorTexture.repeat.set(2, 1)
+bushARMTexture.repeat.set(2, 1)
+bushNormalTexture.repeat.set(2, 1)
+
+bushColorTexture.wrapS = THREE.RepeatWrapping
+bushARMTexture.wrapS = THREE.RepeatWrapping
+bushNormalTexture.wrapS = THREE.RepeatWrapping
+
+bushColorTexture.colorSpace = THREE.SRGBColorSpace
+
+// Grave
+const graveColorTexture = textureLoader.load('./grave/plastered_stone_wall_1k/plastered_stone_wall_diff_1k.webp')
+const graveARMTexture = textureLoader.load('./grave/plastered_stone_wall_1k/plastered_stone_wall_arm_1k.webp')
+const graveNormalTexture = textureLoader.load('./grave/plastered_stone_wall_1k/plastered_stone_wall_nor_gl_1k.webp')
+
+graveColorTexture.repeat.set(.3, .4)
+graveARMTexture.repeat.set(.3, .4)
+graveNormalTexture.repeat.set(.3, .4)
+
+graveColorTexture.colorSpace = THREE.SRGBColorSpace
+
+// Door
+const doorColorTexture = textureLoader.load('./door/color.webp')
+const doorAlphaTexture = textureLoader.load('./door/alpha.webp')
+const doorAOTexture = textureLoader.load('./door/ambientOcclusion.webp')
+const doorHeightTexture = textureLoader.load('./door/height.webp')
+const doorNormalTexture = textureLoader.load('./door/normal.webp')
+const doorMetalnessTexture = textureLoader.load('./door/metalness.webp')
+const doorRoughnessTexture = textureLoader.load('./door/roughness.webp')
+
+doorColorTexture.colorSpace = THREE.SRGBColorSpace
+
 /**
  * House
  */
@@ -121,36 +158,68 @@ roof.rotation.y = Math.PI / 4
 house.add(roof)
 
 // Door
-const door = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), new THREE.MeshStandardMaterial())
+const door = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2, 100, 100), new THREE.MeshStandardMaterial(
+  {
+    map: doorColorTexture,
+    alphaMap: doorAlphaTexture,
+    transparent: true,
+    aoMap: doorAOTexture,
+    roughnessMap: doorRoughnessTexture,
+    metalnessMap: doorMetalnessTexture,
+    normalMap: doorNormalTexture,
+    displacementMap: doorHeightTexture,
+    displacementScale: .15,
+    displacementBias: -0.04
+  }
+))
 door.position.y = 1
 door.position.z = 2.001 // extra space to avoid z fighting
 house.add(door)
 
 // Bushes
 const bushGeometry = new THREE.SphereGeometry(1, 16, 16)
-const bushMaterial = new THREE.MeshStandardMaterial()
+const bushMaterial = new THREE.MeshStandardMaterial(
+  {
+    color: '#ccffcc',
+    map: bushColorTexture,
+    aoMap: bushARMTexture,
+    roughnessMap: bushARMTexture,
+    metalnessMap: bushARMTexture,
+    normalMap: bushNormalTexture,
+  }
+)
 
 const bush1 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush1.position.set(.8, .2, 2.2)
 bush1.scale.setScalar(.5)
+bush1.rotation.x = -.75
 
 const bush2 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush2.position.set(1.4, .1, 2.1)
 bush2.scale.set(.25, .25, .25)
+bush2.rotation.x = -.75
 
 const bush3 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush3.position.set(-.8, .1, 2.2)
 bush3.scale.set(.4, .4, .4)
+bush3.rotation.x = -.75
 
 const bush4 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush4.position.set(-1, .05, 2.6)
 bush4.scale.set(.15, .15, .15)
+bush4.rotation.x = -.75
 
 house.add(bush1, bush2, bush3, bush4)
 
 // Graves
 const graveGeometry = new THREE.BoxGeometry(.6, .8, .2)
-const graveMaterial = new THREE.MeshStandardMaterial()
+const graveMaterial = new THREE.MeshStandardMaterial({
+  map: graveColorTexture,
+  aoMap: graveARMTexture,
+  roughnessMap: graveARMTexture,
+  metalnessMap: graveARMTexture,
+  normalMap: graveNormalTexture,
+})
 
 const graves = new THREE.Group()
 scene.add(graves)
@@ -193,6 +262,11 @@ const floorGroup = gui.addFolder('Floor')
 floorGroup.close()
 floorGroup.add(floor.material, 'displacementScale').min(0).max(1).step(0.001).name('Displacement Scale')
 floorGroup.add(floor.material, 'displacementBias').min(-1).max(1).step(0.001).name('Displacement Bias')
+
+const doorGroup = gui.addFolder('Door')
+doorGroup.close()
+doorGroup.add(door.material, 'displacementScale').min(0).max(1).step(0.001).name('Displacement Scale')
+doorGroup.add(door.material, 'displacementBias').min(-1).max(1).step(0.001).name('Displacement Bias')
 
 /**
  * Sizes
