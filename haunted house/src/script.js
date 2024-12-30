@@ -2,8 +2,6 @@ import * as THREE from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import {Timer} from 'three/addons/misc/Timer.js'
 import GUI from 'lil-gui'
-import {sRGBToLinear} from "three/nodes";
-import {TextureHelper} from "three/addons";
 
 /**
  * Base
@@ -49,6 +47,28 @@ floorDisplacementTexture.wrapT = THREE.RepeatWrapping
 
 floorColorTexture.colorSpace = THREE.SRGBColorSpace
 
+// Wall
+const wallColorTexture = textureLoader.load('./wall/castle_brick_broken_06_1k/castle_brick_broken_06_diff_1k.webp')
+const wallARMTexture = textureLoader.load('./wall/castle_brick_broken_06_1k/castle_brick_broken_06_arm_1k.webp')
+const wallNormalTexture = textureLoader.load('./wall/castle_brick_broken_06_1k/castle_brick_broken_06_nor_gl_1k.webp')
+
+wallColorTexture.colorSpace = THREE.SRGBColorSpace
+
+// Roof
+const roofColorTexture = textureLoader.load('./roof/roof_slates_02_1k/roof_slates_02_diff_1k.webp')
+const roofARMTexture = textureLoader.load('./roof/roof_slates_02_1k/roof_slates_02_arm_1k.webp')
+const roofNormalTexture = textureLoader.load('./roof/roof_slates_02_1k/roof_slates_02_nor_gl_1k.webp')
+
+roofColorTexture.repeat.set(3, 1)
+roofARMTexture.repeat.set(3, 1)
+roofNormalTexture.repeat.set(3, 1)
+
+roofColorTexture.wrapS = THREE.RepeatWrapping
+roofARMTexture.wrapS = THREE.RepeatWrapping
+roofNormalTexture.wrapS = THREE.RepeatWrapping
+
+roofColorTexture.colorSpace = THREE.SRGBColorSpace
+
 /**
  * House
  */
@@ -76,12 +96,26 @@ const house = new THREE.Group()
 scene.add(house)
 
 // Walls
-const walls = new THREE.Mesh(new THREE.BoxGeometry(4, 2.5, 4), new THREE.MeshStandardMaterial())
+const walls = new THREE.Mesh(new THREE.BoxGeometry(4, 2.5, 4), new THREE.MeshStandardMaterial({
+  map: wallColorTexture,
+  aoMap: wallARMTexture,
+  roughnessMap: wallARMTexture,
+  metalnessMap: wallARMTexture,
+  normalMap: wallNormalTexture,
+}))
 walls.position.y = 1.25 // wall height / 2
 house.add(walls)
 
 // Roof
-const roof = new THREE.Mesh(new THREE.ConeGeometry(3.5, 1.5, 4), new THREE.MeshStandardMaterial())
+const roof = new THREE.Mesh(new THREE.ConeGeometry(3.5, 1.5, 4), new THREE.MeshStandardMaterial(
+  {
+    map: roofColorTexture,
+    aoMap: roofARMTexture,
+    roughnessMap: roofARMTexture,
+    metalnessMap: roofARMTexture,
+    normalMap: roofNormalTexture,
+  }
+))
 roof.position.y = 3.25 // wall height + (roof height / 2)
 roof.rotation.y = Math.PI / 4
 house.add(roof)
@@ -155,8 +189,10 @@ scene.add(directionalLight)
 /**
  * Debug UI
  */
-gui.add(floor.material, 'displacementScale').min(0).max(1).step(0.001).name('Floor Displacement Scale')
-gui.add(floor.material, 'displacementBias').min(-1).max(1).step(0.001).name('Floor Displacement Bias')
+const floorGroup = gui.addFolder('Floor')
+floorGroup.close()
+floorGroup.add(floor.material, 'displacementScale').min(0).max(1).step(0.001).name('Displacement Scale')
+floorGroup.add(floor.material, 'displacementBias').min(-1).max(1).step(0.001).name('Displacement Bias')
 
 /**
  * Sizes
