@@ -244,29 +244,56 @@ for (let i = 0; i < 30; i++) {
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
+const ambientLight = new THREE.AmbientLight('#86cdff', 0.275)
 scene.add(ambientLight)
 
 // Directional light
-const directionalLight = new THREE.DirectionalLight('#ffffff', 1.5)
+const directionalLight = new THREE.DirectionalLight('#86cdff', 1)
 directionalLight.position.set(3, 2, -8)
 scene.add(directionalLight)
 
 // const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
 // scene.add(directionalLightHelper)
 
+const doorLight = new THREE.PointLight('#ff7d46', 5)
+doorLight.position.set(0, 2.2, 2.5)
+house.add(doorLight)
+
+/**
+ * Ghosts
+ */
+const ghost1 = new THREE.PointLight('#8800ff', 6)
+const ghost2 = new THREE.PointLight('#ff0088', 6)
+const ghost3 = new THREE.PointLight('#ff0000', 6)
+scene.add(ghost1, ghost2, ghost3)
+
+const ghost1LightHelper = new THREE.PointLightHelper(ghost1, 0.2)
+const ghost2LightHelper = new THREE.PointLightHelper(ghost2, 0.2)
+const ghost3LightHelper = new THREE.PointLightHelper(ghost3, 0.2)
+ghost1LightHelper.visible = false
+ghost2LightHelper.visible = false
+ghost3LightHelper.visible = false
+
+scene.add(ghost1LightHelper, ghost2LightHelper, ghost3LightHelper)
+
 /**
  * Debug UI
  */
 const floorGroup = gui.addFolder('Floor')
-floorGroup.close()
 floorGroup.add(floor.material, 'displacementScale').min(0).max(1).step(0.001).name('Displacement Scale')
 floorGroup.add(floor.material, 'displacementBias').min(-1).max(1).step(0.001).name('Displacement Bias')
+floorGroup.close()
 
 const doorGroup = gui.addFolder('Door')
-doorGroup.close()
 doorGroup.add(door.material, 'displacementScale').min(0).max(1).step(0.001).name('Displacement Scale')
 doorGroup.add(door.material, 'displacementBias').min(-1).max(1).step(0.001).name('Displacement Bias')
+doorGroup.close()
+
+const ghostGroup = gui.addFolder('Ghosts')
+ghostGroup.add(ghost1LightHelper, 'visible').name('Light Helper Ghost 1')
+ghostGroup.add(ghost2LightHelper, 'visible').name('Light Helper Ghost 2')
+ghostGroup.add(ghost3LightHelper, 'visible').name('Light Helper Ghost 3')
+ghostGroup.close()
 
 /**
  * Sizes
@@ -322,6 +349,22 @@ const tick = () => {
   // Timer
   timer.update()
   const elapsedTime = timer.getElapsed()
+
+  // Ghosts
+  const ghost1Angle = elapsedTime * .5 // change here to slow down the speed
+  ghost1.position.x = Math.cos(ghost1Angle) * 4
+  ghost1.position.z = Math.sin(ghost1Angle) * 4
+  ghost1.position.y = Math.sin(ghost1Angle) * Math.sin(ghost1Angle * 2.34) * Math.sin(ghost1Angle * 3.45)
+
+  const ghost2Angle = -elapsedTime * .38
+  ghost2.position.x = Math.cos(ghost2Angle) * 5
+  ghost2.position.z = Math.sin(ghost2Angle) * 5
+  ghost2.position.y = Math.sin(ghost2Angle) * Math.sin(ghost2Angle * 2.34) * Math.sin(ghost2Angle * 3.45)
+
+  const ghost3Angle = elapsedTime * .23
+  ghost3.position.x = Math.cos(ghost3Angle) * 6
+  ghost3.position.z = Math.sin(ghost3Angle) * 6
+  ghost3.position.y = Math.sin(ghost3Angle) * Math.sin(ghost3Angle * 2.34) * Math.sin(ghost3Angle * 3.45)
 
   // Update controls
   controls.update()
