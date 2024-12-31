@@ -237,6 +237,9 @@ for (let i = 0; i < 30; i++) {
   grave.rotation.y = (Math.random() - 0.5) * .4
   grave.rotation.z = (Math.random() - 0.5) * .4
 
+  grave.castShadow = true
+  grave.receiveShadow = true
+
   graves.add(grave)
 }
 
@@ -252,8 +255,9 @@ const directionalLight = new THREE.DirectionalLight('#86cdff', 1)
 directionalLight.position.set(3, 2, -8)
 scene.add(directionalLight)
 
-// const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
-// scene.add(directionalLightHelper)
+const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
+directionalLightHelper.visible = false
+scene.add(directionalLightHelper)
 
 const doorLight = new THREE.PointLight('#ff7d46', 5)
 doorLight.position.set(0, 2.2, 2.5)
@@ -289,11 +293,12 @@ doorGroup.add(door.material, 'displacementScale').min(0).max(1).step(0.001).name
 doorGroup.add(door.material, 'displacementBias').min(-1).max(1).step(0.001).name('Displacement Bias')
 doorGroup.close()
 
-const ghostGroup = gui.addFolder('Ghosts')
-ghostGroup.add(ghost1LightHelper, 'visible').name('Light Helper Ghost 1')
-ghostGroup.add(ghost2LightHelper, 'visible').name('Light Helper Ghost 2')
-ghostGroup.add(ghost3LightHelper, 'visible').name('Light Helper Ghost 3')
-ghostGroup.close()
+const lightsGroup = gui.addFolder('Lights')
+lightsGroup.add(directionalLightHelper, 'visible').name('Light Helper Directional Light')
+lightsGroup.add(ghost1LightHelper, 'visible').name('Light Helper Ghost 1')
+lightsGroup.add(ghost2LightHelper, 'visible').name('Light Helper Ghost 2')
+lightsGroup.add(ghost3LightHelper, 'visible').name('Light Helper Ghost 3')
+lightsGroup.close()
 
 /**
  * Sizes
@@ -339,6 +344,44 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+/**
+ * Shadows
+ */
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+directionalLight.castShadow = true
+ghost1.castShadow = true
+ghost2.castShadow = true
+ghost3.castShadow = true
+
+roof.castShadow = true
+floor.receiveShadow = true
+walls.castShadow = true
+walls.receiveShadow = true
+
+// Mapping
+directionalLight.shadow.mapSize.width = 256
+directionalLight.shadow.mapSize.height = 256
+directionalLight.shadow.camera.top = 8
+directionalLight.shadow.camera.right = 8
+directionalLight.shadow.camera.bottom = -8
+directionalLight.shadow.camera.left = - 8
+directionalLight.shadow.camera.near = 1
+directionalLight.shadow.camera.far = 20
+
+ghost1.shadow.mapSize.width = 256
+ghost1.shadow.mapSize.height = 256
+ghost1.shadow.camera.far = 10
+
+ghost2.shadow.mapSize.width = 256
+ghost2.shadow.mapSize.height = 256
+ghost2.shadow.camera.far = 10
+
+ghost3.shadow.mapSize.width = 256
+ghost3.shadow.mapSize.height = 256
+ghost3.shadow.camera.far = 10
 
 /**
  * Animate
