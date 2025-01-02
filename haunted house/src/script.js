@@ -429,6 +429,10 @@ const tick = () => {
   ghost3.position.z = Math.sin(ghost3Angle) * 6
   ghost3.position.y = Math.sin(ghost3Angle) * Math.sin(ghost3Angle * 2.34) * Math.sin(ghost3Angle * 3.45)
 
+  // Door light
+  const lightIntensity = elapsedTime * 2
+  doorLight.intensity = (Math.sin(lightIntensity) * Math.sin(lightIntensity * 3.34) * Math.sin(lightIntensity * 3.46)) + 1.5
+
   // Update controls
   controls.update()
 
