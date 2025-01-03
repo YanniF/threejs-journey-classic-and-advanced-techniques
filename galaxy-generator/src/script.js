@@ -25,6 +25,8 @@ const parameters = {
   spin: 1, // the angle the branch will twist
   randomness: 0.2, // how much the particles will spread based on the radius
   randomnessPower: 3, // how much the particles will be concentrated in the center of the branch, power of 1 will make them more spread out
+  insideColor: '#ff6030',
+  outsideColor: '#1b3984'
 }
 
 let geometry = null
@@ -39,7 +41,11 @@ const generateGalaxy = () => {
   }
 
   geometry = new THREE.BufferGeometry()
+
   const positions = new Float32Array(parameters.count * 3)
+  const colors = new Float32Array(parameters.count * 3)
+  const insideColor = new THREE.Color(parameters.insideColor)
+  const outsideColor = new THREE.Color(parameters.outsideColor)
 
   for (let i = 0; i < parameters.count; i++) {
     const i3 = i * 3
@@ -55,9 +61,17 @@ const generateGalaxy = () => {
     positions[i3    ] = Math.cos(branchAngle + spinAngle) * radius + randomX
     positions[i3 + 1] = randomY
     positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ
+
+    const mixedColor = insideColor.clone()
+    mixedColor.lerp(outsideColor, radius / parameters.radius) // the mixed value will be based on the distance of center of the scene
+
+    colors[i3    ] = mixedColor.r
+    colors[i3 + 1] = mixedColor.g
+    colors[i3 + 2] = mixedColor.b
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 
   // Material
   material = new THREE.PointsMaterial({
@@ -65,6 +79,7 @@ const generateGalaxy = () => {
     sizeAttenuation: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    vertexColors: true,
   })
 
   points = new THREE.Points(geometry, material)
@@ -80,6 +95,8 @@ gui.add(parameters, 'branches').min(2).max(20).step(1).name('Branches').onFinish
 gui.add(parameters, 'spin').min(-5).max(5).step(0.001).name('Spin Angle').onFinishChange(generateGalaxy)
 gui.add(parameters, 'randomness').min(0).max(2).step(0.001).name('Spread').onFinishChange(generateGalaxy)
 gui.add(parameters, 'randomnessPower').min(1).max(10).step(0.001).name('Spread radius distance').onFinishChange(generateGalaxy)
+gui.addColor(parameters, 'insideColor').onFinishChange(generateGalaxy)
+gui.addColor(parameters, 'outsideColor').onFinishChange(generateGalaxy)
 
 /**
  * Sizes
