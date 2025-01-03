@@ -94,7 +94,7 @@ gui.add(parameters, 'radius').min(0.01).max(20).step(0.01).name('Radius').onFini
 gui.add(parameters, 'branches').min(2).max(20).step(1).name('Branches').onFinishChange(generateGalaxy)
 gui.add(parameters, 'spin').min(-5).max(5).step(0.001).name('Spin Angle').onFinishChange(generateGalaxy)
 gui.add(parameters, 'randomness').min(0).max(2).step(0.001).name('Spread').onFinishChange(generateGalaxy)
-gui.add(parameters, 'randomnessPower').min(1).max(10).step(0.001).name('Spread radius distance').onFinishChange(generateGalaxy)
+gui.add(parameters, 'randomnessPower').min(1).max(10).step(0.001).name('Concentrate particles').onFinishChange(generateGalaxy)
 gui.addColor(parameters, 'insideColor').onFinishChange(generateGalaxy)
 gui.addColor(parameters, 'outsideColor').onFinishChange(generateGalaxy)
 

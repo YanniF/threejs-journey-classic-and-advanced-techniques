@@ -9,3 +9,5 @@ Generating and animating particles.
 
 ## Galaxy Generator
 Change the values to generate a cool spiral galaxy.
+<br>
+[Live here](https://galaxy-generator-brown-kappa.vercel.app/)
