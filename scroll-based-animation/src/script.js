@@ -24,6 +24,8 @@ const scene = new THREE.Scene()
 /**
  * Objects
  */
+const objectsDistance = 4
+
 // Texture
 const textureLoader = new THREE.TextureLoader()
 const gradientTexture = textureLoader.load('textures/gradients/3-purple.jpg')
@@ -52,7 +54,13 @@ const mesh3 = new THREE.Mesh(
   material
 )
 
+// mesh1.position.y = 0
+mesh2.position.y = -objectsDistance
+mesh3.position.y = -objectsDistance * 2
+
 scene.add(mesh1, mesh2, mesh3)
+
+const sectionMeshes = [mesh1, mesh2, mesh3]
 
 /**
  * Lights
@@ -108,6 +116,12 @@ const clock = new THREE.Clock()
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime()
+
+  // animate meshes
+  sectionMeshes.forEach(mesh => {
+    mesh.rotation.x = elapsedTime * .1
+    mesh.rotation.y = elapsedTime * .12
+  })
 
   // Render
   renderer.render(scene, camera)
