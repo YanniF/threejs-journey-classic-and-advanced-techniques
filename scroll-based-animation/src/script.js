@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import GUI from 'lil-gui'
+import gsap from 'gsap'
 
 /**
  * Debug
@@ -10,7 +11,10 @@ const parameters = {
   materialColor: '#bc8ecd'
 }
 
-gui.addColor(parameters, 'materialColor').onChange(() => material.color.set(parameters.materialColor))
+gui.addColor(parameters, 'materialColor').onChange(() => {
+  material.color.set(parameters.materialColor)
+  particlesMaterial.color.set(parameters.materialColor)
+})
 
 /**
  * Base
@@ -54,6 +58,8 @@ const mesh3 = new THREE.Mesh(
   material
 )
 
+const sectionMeshes = [mesh1, mesh2, mesh3]
+
 // mesh1.position.y = 0
 mesh2.position.y = -objectsDistance
 mesh3.position.y = -objectsDistance * 2
@@ -64,7 +70,32 @@ mesh3.position.x = 2
 
 scene.add(mesh1, mesh2, mesh3)
 
-const sectionMeshes = [mesh1, mesh2, mesh3]
+/**
+ * Particles
+ */
+// Geometry
+const particlesCount = 300
+const positions = new Float32Array(particlesCount * 3)
+
+for (let i = 0; i < particlesCount; i++) {
+  positions[i * 3] = (Math.random() - .5) * 10
+  positions[i * 3 + 1] = objectsDistance * 0.5 - Math.random() * objectsDistance * sectionMeshes.length
+  positions[i * 3 + 2] = (Math.random() - .5) * 10
+}
+
+const particlesGeometry = new THREE.BufferGeometry()
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+// Material
+const particlesMaterial = new THREE.PointsMaterial({
+  color: parameters.materialColor,
+  sizeAttenuation: true,
+  size: .05
+})
+
+// Points
+const particles = new THREE.Points(particlesGeometry, particlesMaterial)
+scene.add(particles)
 
 /**
  * Lights
@@ -121,8 +152,24 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  * Scroll
  */
 let scrollY = window.scrollY
+let currentSection = 0
+
 window.addEventListener('scroll', () => {
   scrollY = window.scrollY
+
+  const newSection = Math.round(scrollY / sizes.height)
+
+  if (newSection !== currentSection) {
+    currentSection = newSection
+
+    gsap.to(sectionMeshes[currentSection].rotation, {
+      duration: 1.5,
+      ease: 'power2.inOut',
+      x: '+=6',
+      y: '+=3',
+      z: '+=1.5'
+    })
+  }
 })
 
 /**
@@ -151,8 +198,8 @@ const tick = () => {
 
   // animate meshes
   sectionMeshes.forEach(mesh => {
-    mesh.rotation.x = elapsedTime * .1
-    mesh.rotation.y = elapsedTime * .12
+    mesh.rotation.x += deltaTime * .1
+    mesh.rotation.y += deltaTime * .12
   })
 
   // animate camera
