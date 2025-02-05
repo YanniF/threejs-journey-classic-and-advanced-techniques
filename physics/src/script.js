@@ -33,6 +33,31 @@ const environmentMapTexture = cubeTextureLoader.load([
 ])
 
 /**
+ * Physics
+ */
+// world
+const world = new CANNON.World()
+world.gravity.set(0, -9.82, 0)
+
+// sphere
+const sphereShape = new CANNON.Sphere(0.5)
+const sphereBody = new CANNON.Body({
+  mass: 1,
+  position: new CANNON.Vec3(0, 3, 0),
+  shape: sphereShape,
+})
+world.addBody(sphereBody)
+
+// floor
+const floorShape = new CANNON.Plane()
+const floorBody = new CANNON.Body({
+  // mass: 0, // set mass to 0 this will make the object static and it won't move
+  shape: floorShape,
+})
+floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
+world.addBody(floorBody)
+
+/**
  * Test sphere
  */
 const sphere = new THREE.Mesh(
@@ -54,7 +79,7 @@ scene.add(sphere)
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(10, 10),
   new THREE.MeshStandardMaterial({
-    color: '#5ebe93',
+    color: '#4c9d7b',
     metalness: 0.3,
     roughness: 0.4,
     envMap: environmentMapTexture,
@@ -90,8 +115,7 @@ const sizes = {
   height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
   // Update sizes
   sizes.width = window.innerWidth
   sizes.height = window.innerHeight
@@ -133,10 +157,19 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  * Animate
  */
 const clock = new THREE.Clock()
+let oldElapsedTime = 0
 
 const tick = () =>
 {
   const elapsedTime = clock.getElapsedTime()
+  const deltaTime = elapsedTime - oldElapsedTime
+  oldElapsedTime = elapsedTime
+
+  // update physics world
+  // 60 = 60 fps
+  world.step(1 / 60, deltaTime, 3)
+
+  sphere.position.copy(sphereBody.position)
 
   // Update controls
   controls.update()
