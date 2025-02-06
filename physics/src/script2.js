@@ -7,17 +7,6 @@ import CANNON from 'cannon'
  * Debug
  */
 const gui = new GUI()
-const debugObject = {
-  createSphere: () => {
-    createSphere(
-      Math.random() * 0.5, {
-      x: (Math.random() - 0.5) * 5,
-      y: 3,
-      z: (Math.random() - 0.5) * 5
-    })
-  }
-}
-gui.add(debugObject, 'createSphere').name('Add Sphere')
 
 /**
  * Base
@@ -51,6 +40,17 @@ const world = new CANNON.World()
 world.gravity.set(0, -9.82, 0)
 
 // materials
+// const concreteMaterial = new CANNON.Material('concrete')
+// const plasticMaterial = new CANNON.Material('plastic')
+//
+// const concretePlasticContactMaterial = new CANNON.ContactMaterial(
+//   concreteMaterial,
+//   plasticMaterial, {
+//     friction: .1,
+//     restitution: .7
+//   }
+// )
+// world.addContactMaterial(concretePlasticContactMaterial)
 const defaultMaterial = new CANNON.Material('default')
 const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
   frictional: .1,
@@ -59,13 +59,42 @@ const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defau
 world.addContactMaterial(defaultContactMaterial)
 world.defaultContactMaterial = defaultContactMaterial
 
+// sphere
+const sphereShape = new CANNON.Sphere(0.5)
+const sphereBody = new CANNON.Body({
+  mass: 1,
+  position: new CANNON.Vec3(0, 3, 0),
+  shape: sphereShape,
+  // material: plasticMaterial
+})
+sphereBody.applyLocalForce(new CANNON.Vec3(150, 0, 0), new CANNON.Vec3(0, 0, 0))
+world.addBody(sphereBody)
+
 // floor
 const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body({
+  // mass: 0, // set mass to 0 this will make the object static and it won't move
   shape: floorShape,
+  // material: concreteMaterial
 })
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
 world.addBody(floorBody)
+
+/**
+ * Test sphere
+ */
+const sphere = new THREE.Mesh(
+  new THREE.SphereGeometry(0.5, 32, 32),
+  new THREE.MeshStandardMaterial({
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+    envMapIntensity: 0.5
+  })
+)
+sphere.castShadow = true
+sphere.position.y = 0.5
+scene.add(sphere)
 
 /**
  * Floor
@@ -73,7 +102,7 @@ world.addBody(floorBody)
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(10, 10),
   new THREE.MeshStandardMaterial({
-    color: '#7fa9cb',
+    color: '#4c9d7b',
     metalness: 0.3,
     roughness: 0.4,
     envMap: environmentMapTexture,
@@ -148,60 +177,23 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
- * Utils
- */
-const objectsToUpdate = []
-const sphereGeometry =  new THREE.SphereGeometry(1, 20, 20)
-
-const createSphere = (radius, position) => {
-  // to make things more performant, I could have used only one material, but I want to have different colors
-  const mesh = new THREE.Mesh(
-    sphereGeometry,
-    new THREE.MeshStandardMaterial({
-      color: new THREE.Color().setRGB(Math.random(), Math.random(), Math.random()),
-      metalness: .3,
-      roughness: .4,
-      envMap: environmentMapTexture
-    })
-  )
-
-  mesh.scale.set(radius, radius, radius)
-  mesh.castShadow = true
-  mesh.position.copy(position)
-
-  scene.add(mesh)
-
-  const body = new CANNON.Body({
-    mass: 1,
-    shape: new CANNON.Sphere(radius)
-  })
-  body.position.copy(position)
-
-  world.addBody(body)
-
-  objectsToUpdate.push({ mesh, body })
-}
-
-createSphere(.5, { x: 0, y: 3, z: 0 })
-
-/**
  * Animate
  */
 const clock = new THREE.Clock()
 let oldElapsedTime = 0
 
-const tick = () => {
+const tick = () =>
+{
   const elapsedTime = clock.getElapsedTime()
   const deltaTime = elapsedTime - oldElapsedTime
   oldElapsedTime = elapsedTime
 
   // update physics world
+  sphereBody.applyForce(new CANNON.Vec3(-.5, 0, 0), sphereBody.position)
   // 60 = 60 fps
   world.step(1 / 60, deltaTime, 3)
 
-  objectsToUpdate.forEach(obj => {
-    obj.mesh.position.copy(obj.body.position)
-  })
+  sphere.position.copy(sphereBody.position)
 
   // Update controls
   controls.update()
