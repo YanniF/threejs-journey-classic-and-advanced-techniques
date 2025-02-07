@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import CANNON from 'cannon'
+import * as CANNON from 'cannon-es'
 
 /**
  * Debug
@@ -10,7 +10,7 @@ const gui = new GUI()
 const debugObject = {
   createSphere: () => {
     createSphere(
-      Math.random() * 0.5, {
+      Math.random() * 0.5 + 0.1, {
       x: (Math.random() - 0.5) * 5,
       y: 3,
       z: (Math.random() - 0.5) * 5
@@ -18,18 +18,31 @@ const debugObject = {
   },
   createBox: () => {
     createBox(
-      Math.random(),
-      Math.random(),
-      Math.random(),
+      Math.random() + 0.08,
+      Math.random() + 0.08,
+      Math.random() + 0.08,
       {
         x: (Math.random() - 0.5) * 3,
-        y: 3,
+        y: 4,
         z: (Math.random() - 0.5) * 3
       })
+  },
+  resetScene: () => {
+    objectsToUpdate.forEach((object) => {
+      // remove body
+      object.body.removeEventListener('collide', playHitSound)
+      world.removeBody(object.body)
+
+      // remove mesh
+      scene.remove(object.mesh)
+    })
+
+    objectsToUpdate.splice(0, objectsToUpdate.length)
   }
 }
 gui.add(debugObject, 'createSphere').name('Add Sphere')
 gui.add(debugObject, 'createBox').name('Add Box')
+gui.add(debugObject, 'resetScene').name('Reset Scene')
 
 /**
  * Base
@@ -41,9 +54,23 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
+ * Sounds
+ */
+const hitSound = new Audio('/sounds/hit.mp3')
+
+const playHitSound = (collision) => {
+  const impactStrength = collision.contact.getImpactVelocityAlongNormal()
+
+  if (impactStrength > 1) {
+    hitSound.currentTime = 0
+    hitSound.volume = impactStrength >= 10 ? 1 : impactStrength / 10
+    hitSound.play()
+  }
+}
+
+/**
  * Textures
  */
-const textureLoader = new THREE.TextureLoader()
 const cubeTextureLoader = new THREE.CubeTextureLoader()
 
 const environmentMapTexture = cubeTextureLoader.load([
@@ -190,6 +217,7 @@ const createSphere = (radius, position) => {
     shape: new CANNON.Sphere(radius)
   })
   body.position.copy(position)
+  body.addEventListener('collide', playHitSound)
 
   world.addBody(body)
 
@@ -221,6 +249,7 @@ const createBox = (width, height, depth, position) => {
     shape
   })
   body.position.copy(position)
+  body.addEventListener('collide', playHitSound)
 
   world.addBody(body)
 
