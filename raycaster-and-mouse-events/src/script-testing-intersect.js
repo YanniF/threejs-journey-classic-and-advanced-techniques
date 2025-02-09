@@ -1,9 +1,13 @@
 import * as THREE from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
+import GUI from 'lil-gui'
 
 /**
  * Base
  */
+// Debug
+const gui = new GUI()
+
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -30,13 +34,37 @@ const object3 = new THREE.Mesh(
 )
 object3.position.x = 2
 
-scene.add(object1, object2, object3)
+const cylinderObject = new THREE.CylinderGeometry(0.4, 0.3, 0.2, 8)
+const fakeRayCaster = new THREE.Mesh(
+  cylinderObject,
+  new THREE.MeshBasicMaterial({color: '#ad31de'})
+)
+fakeRayCaster.position.set(-3, 0, 0)
+fakeRayCaster.rotation.z = Math.PI * 0.5
+
+const wireMesh = new THREE.Mesh(cylinderObject, new THREE.MeshBasicMaterial({
+  color: '#8b10bb',
+  wireframe: true,
+}));
+wireMesh.scale.setScalar(1.001);
+fakeRayCaster.add(wireMesh)
+
+scene.add(object1, object2, object3, fakeRayCaster)
 
 /**
  * raycaster
  */
 const raycaster = new THREE.Raycaster()
-let currentIntersect = null
+const rayOrigin = new THREE.Vector3(-3, 0, 0)
+const rayDirection = new THREE.Vector3(10, 0, 0)
+rayDirection.normalize()
+raycaster.set(rayOrigin, rayDirection)
+
+// const intersect = raycaster.intersectObject(object2)
+// console.log('intersect', intersect)
+//
+// const intersects = raycaster.intersectObjects([object1, object2, object3])
+// console.log('intersects', intersects)
 
 /**
  * Sizes
@@ -58,35 +86,6 @@ window.addEventListener('resize', () => {
   // Update renderer
   renderer.setSize(sizes.width, sizes.height)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
-
-/**
- * mouse event
- */
-const mouse = new THREE.Vector2()
-
-window.addEventListener('mousemove', (event) => {
-  mouse.x = event.clientX / sizes.width * 2 - 1
-  mouse.y = -(event.clientY / sizes.height) * 2 + 1
-})
-
-window.addEventListener('click', (event) => {
-  if (currentIntersect) {
-    const objScale = currentIntersect.object.scale
-    objScale.set(objScale.x - 0.1, objScale.y - 0.1, objScale.z - 0.1)
-
-    switch(currentIntersect.object) {
-      case object1:
-        console.log('object 1 clicked')
-        break
-      case object2:
-        console.log('object 2 clicked')
-        break
-      case object3:
-        console.log('object 3 clicked')
-        break
-    }
-  }
 })
 
 /**
@@ -124,28 +123,11 @@ const tick = () => {
   object3.position.y = Math.sin(elapsedTime * 0.5) * 1.5
 
   // cast a ray
-  raycaster.setFromCamera(mouse, camera)
-
   const objectsToTest = [object1, object2, object3]
   const intersects = raycaster.intersectObjects(objectsToTest)
 
   objectsToTest.forEach(item => item.material.color.set('#53ad1a'))
-  intersects.forEach(item => item.object.material.color.set('#23cec0'))
-
-  if (intersects.length) {
-    if(!currentIntersect) {
-      console.log('mouse enter')
-    }
-
-    currentIntersect = intersects[0]
-  }
-  else {
-    if(currentIntersect) {
-      console.log('mouse leave')
-    }
-
-    currentIntersect = null
-  }
+  intersects.forEach(item => item.object.material.color.set('#8b10bb'))
 
   // Update controls
   controls.update()
@@ -158,5 +140,3 @@ const tick = () => {
 }
 
 tick()
-
-document.querySelector('.message').style.display = 'block'
