@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
+import {DRACOLoader} from 'three/examples/jsm/loaders/DRACOLoader.js'
+import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader.js";
 
 /**
  * Base
@@ -9,6 +11,24 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+
+// ducking duck
+const dracoLoader = new DRACOLoader()
+dracoLoader.setDecoderPath('/draco/')
+
+const gltfLoader = new GLTFLoader()
+gltfLoader.setDRACOLoader(dracoLoader)
+
+let duckModel = null
+
+gltfLoader.load('./models/Duck/glTF-Draco/Duck.gltf', (obj) => {
+  duckModel = obj.scene.children[0]
+  duckModel.rotation.y = - Math.PI
+  duckModel.position.x = 4
+  duckModel.position.y = -1.5
+  duckModel.scale.set(.005, .005, .005)
+  scene.add(duckModel)
+})
 
 /**
  * Objects
@@ -37,6 +57,12 @@ scene.add(object1, object2, object3)
  */
 const raycaster = new THREE.Raycaster()
 let currentIntersect = null
+
+/**
+ * lights
+ */
+const ambientLight = new THREE.AmbientLight(0xffffff, 2.8)
+scene.add(ambientLight)
 
 /**
  * Sizes
@@ -70,7 +96,7 @@ window.addEventListener('mousemove', (event) => {
   mouse.y = -(event.clientY / sizes.height) * 2 + 1
 })
 
-window.addEventListener('click', (event) => {
+window.addEventListener('click', () => {
   if (currentIntersect) {
     const objScale = currentIntersect.object.scale
     objScale.set(objScale.x - 0.1, objScale.y - 0.1, objScale.z - 0.1)
@@ -131,20 +157,18 @@ const tick = () => {
 
   objectsToTest.forEach(item => item.material.color.set('#53ad1a'))
   intersects.forEach(item => item.object.material.color.set('#23cec0'))
+  currentIntersect = intersects.length ? intersects[0] : null
 
-  if (intersects.length) {
-    if(!currentIntersect) {
-      console.log('mouse enter')
+  // test intersect with a model
+  if (duckModel) {
+    const modelIntersects = raycaster.intersectObject(duckModel)
+
+    if (modelIntersects.length) {
+        duckModel.scale.setScalar(.008)
     }
-
-    currentIntersect = intersects[0]
-  }
-  else {
-    if(currentIntersect) {
-      console.log('mouse leave')
+    else {
+        duckModel.scale.setScalar(.005)
     }
-
-    currentIntersect = null
   }
 
   // Update controls
