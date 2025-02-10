@@ -22,14 +22,14 @@ const scene = new THREE.Scene()
 const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('/draco/')
 
-const glftLoader = new GLTFLoader()
-glftLoader.setDRACOLoader(dracoLoader)
+const gltfLoader = new GLTFLoader()
+gltfLoader.setDRACOLoader(dracoLoader)
 
 let mixer = null
 
 // Duck
-glftLoader.load('./models/Duck/glTF-Draco/Duck.gltf', (glft) => {
-  const obj = glft.scene.children[0]
+gltfLoader.load('./models/Duck/glTF-Draco/Duck.gltf', (gltf) => {
+  const obj = gltf.scene.children[0]
   obj.position.x = -2
   obj.position.z = 2
   obj.scale.set(.005, .005, .005)
@@ -37,14 +37,14 @@ glftLoader.load('./models/Duck/glTF-Draco/Duck.gltf', (glft) => {
 })
 
 // Helmet
-glftLoader.load('./models/FlightHelmet/glTF/FlightHelmet.gltf', (gltf) => {
+gltfLoader.load('./models/FlightHelmet/glTF/FlightHelmet.gltf', (gltf) => {
   // const children = [...gltf.scene.children]
   // children.forEach(child => scene.add(child))
   // scene.add(gltf.scene)
 })
 
 // Fox
-glftLoader.load('./models/Fox/glTF/Fox.gltf', (gltf ) => {
+gltfLoader.load('./models/Fox/glTF/Fox.gltf', (gltf) => {
   const obj = gltf.scene
 
   mixer = new THREE.AnimationMixer(obj)
