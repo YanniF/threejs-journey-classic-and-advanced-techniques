@@ -1,14 +1,13 @@
 import * as THREE from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import {GLTFLoader, RGBELoader} from "three/addons";
-import { GroundedSkybox} from "three/addons/objects/GroundedSkybox.js";
+import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 
 /**
  * Loaders
  */
 const gltfLoader = new GLTFLoader()
-const rgbeLoader = new RGBELoader()
+const textureLoader = new THREE.TextureLoader()
 
 /**
  * Base
@@ -23,35 +22,38 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
- * environment maps
+ * real time env map
  */
-// HDR texture
-rgbeLoader.load('/environmentMaps/2/2k.hdr', (hdri) => {
-  hdri.mapping = THREE.EquirectangularReflectionMapping
-  scene.environment = hdri
+textureLoader.load('/environmentMaps/blockadesLabsSkybox/interior_views_cozy_wood_cabin_with_cauldron_and_p.jpg', (envMap) => {
+  envMap.mapping = THREE.EquirectangularReflectionMapping
+  envMap.colorSpace = THREE.SRGBColorSpace
 
-  const skybox = new GroundedSkybox(hdri, 15, 70)
-  // skybox.material.wireframe = true;
-  skybox.position.y = 15
-  scene.add(skybox)
+  scene.background = envMap
 })
 
-scene.environmentIntensity = 1
-scene.backgroundIntensity = 1
-scene.backgroundBlurriness = 0
+const holyDonut = new THREE.Mesh(
+  new THREE.TorusGeometry(8, .5),
+  new THREE.MeshBasicMaterial({ color: new THREE.Color(10, 4, 2) })
+)
 
-gui.add(scene, 'environmentIntensity').min(0).max(10).step(0.01).name('Env intensity')
-gui.add(scene, 'backgroundIntensity').min(0).max(1).step(0.001).name('Background intensity')
-gui.add(scene, 'backgroundBlurriness').min(0).max(1).step(0.001).name('Background Blurriness')
-gui.add(scene.backgroundRotation, 'y').min(0).max(Math.PI * 2).step(0.001).name('Background rotation Y')
-gui.add(scene.environmentRotation, 'y').min(0).max(Math.PI * 2).step(0.001).name('Env rotation Y')
+holyDonut.position.y = 3.5
+holyDonut.layers.enable(1)
+scene.add(holyDonut);
+
+// cube render target
+const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, { type: THREE.HalfFloatType })
+scene.environment = cubeRenderTarget.texture
+
+// cube camera
+const cubeCamera = new THREE.CubeCamera(0.1, 100, cubeRenderTarget)
+cubeCamera.layers.set(1)
 
 /**
  * Torus Knot
  */
 const torusKnot = new THREE.Mesh(
   new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
-  new THREE.MeshStandardMaterial({color: '#aaaaaa', roughness: .3, metalness: 1})
+  new THREE.MeshStandardMaterial({color: '#aaaaaa', roughness: .2, metalness: 1})
 )
 
 torusKnot.position.x = -4
@@ -121,6 +123,12 @@ const clock = new THREE.Clock()
 const tick = () => {
   // Time
   const elapsedTime = clock.getElapsedTime()
+
+  // real time env map
+  if (holyDonut) {
+    holyDonut.rotation.x = Math.sin(elapsedTime) * 2
+    cubeCamera.update(renderer, scene)
+  }
 
   // Update controls
   controls.update()

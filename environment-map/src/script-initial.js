@@ -61,8 +61,12 @@ rgbeLoader.load('/environmentMaps/2/2k.hdr', (hdri) => {
 
   scene.background = hdri
   scene.environment = hdri
-})
 
+  // const skybox = new GroundedSkybox(hdri, 15, 70)
+  // skybox.material.wireframe = true;
+  // skybox.position.y = 15
+  // scene.add(skybox)
+})
 
 scene.environmentIntensity = 1
 scene.backgroundIntensity = 1
